@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Produtos</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">    <style>
+       body {
+            font-family: 'Playfair Display', serif; /* Agora está aplicado em todo o corpo */
+    color: #590202;
+    margin: 0;
+    padding: 0;
+     }
+        /* Cabeçalho*/
+    header {
+    background-color: #f8f5f2;
+    padding: 2rem 0;
+    text-align: center;
+    border-bottom: 1px solid #e8e2d9;
+    margin-bottom: 3rem;
+        }
+     h1 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 3.5rem;
+    color: #3a2e26;
+    letter-spacing: 2px;
+    margin: 0;
+    position: relative;
+    display: inline-block;
+  }
+        /*rodapé*/
+        footer{
+             background-color: #590202;;
+            color: #fffefe;
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        /*container principal listagem*/
+     .container {
+    text-align: center; /* Centraliza o conteúdo dentro co conatiner */
+    border: 2px solid #590202; /* Cria uma borda de 2 pixels com a cor vinho escuro */
+    padding: 30px; /* Adiciona um espaçamento interno de 30px em todos os lados */
+    border-radius: 1opx; /* Arredonda os cantos do container em 10px */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Adiciona uma sombra ao redor do container */
+    max-width: 400px; /* Define a largura máxima do container como 400px */
+    margin: 0 auto; /* Centraliza o container horizontalmente na página */
+}
+
+        /* Botões */
+        button {
+            background-color: #590202;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px 5px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #7a0404; /*muda a cor do botão ao passar por cima com o mouse*/
+        }
+        /* Campo de texto */
+        input[type="text"] {
+            padding: 10px; 
+            width: 80%;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+    
+        /* Lista */
+        ul {
+            list-style-type: none;
+            padding: 0;
+            color: #ccc;
+        }
+
+        li {
+            margin: 5px 0;
+            font-size: 18px;
+            color: #ccc;
+        }
+
+        /* Alinha tudo ao centro na vertical */
+        main {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+    padding-top: 60px; /* ou ajuste conforme a nova altura do cabeçalho */
+            min-height: calc(100vh - 100px);
+            padding: 20px;
+        }
+     /* Estilo para o vídeo ocupar a tela toda como fundo */
+       #videoFundo {
+         position: fixed; /* fixa na tela */
+        top: 0;
+        left: 0;
+        width: 100vw;/* largura total da tela */
+        height: 100vh;/* altura total da tela */
+        object-fit: cover;/* cobre toda a área sem distorcer */
+        z-index: -1;/* fica atrás de todo o conteúdo */
+       }
+    </style>
+</head>
+<body>
+
+    <!-- Cabeçalho do site -->
+    <header>
+        <h1>Maison Evangeline</h1>
+    </header>
+<!-- Vídeo de fundo em tela cheia -->
+<video autoplay muted loop id="videoFundo"> <!-- Deixa o vídeo sem som (muted); loop(faz o videio recomeçar de novo)-->
+
+    <source src="https://cdn.cosmos.so/e6c9a9ac-c3a5-41fe-a7c0-06ba091a3033.mp4" type="video/mp4">
+</video>
+    <main>
+        <div class="container">
+            <input type="text" id="produtoInput" placeholder="Digite o nome do produto"> <!--input para adicionar o produto-->
+
+            <div>
+                <button onclick="adicionarProduto()">Adicionar</button> <!--botão para adicionar-->
+                <button onclick="limparLista()">Limpar Lista</button> <!--botão para limpar-->
+            </div>
+
+            <ul id="listaProdutos"></ul> <!-- Lista onde os produtos adicionados serão exibidos -->
+        </div>
+    </main>
+
+    <script>
+        function adicionarProduto() {
+            const input = document.getElementById("produtoInput");
+            const produto = input.value.trim(); // Corrigido: pega o valor do input
+    
+            if (produto !== "") {
+                const li = document.createElement("li"); // Corrigido: cria um <li>, não <lista>
+                li.textContent = produto;
+                document.getElementById("listaProdutos").appendChild(li);
+                input.value = ""; // limpa o campo
+            }
+        }
+    
+        function limparLista() {
+            document.getElementById("listaProdutos").innerHTML = "";
+        }
+    </script>
+    
+    <footer>
+        2025 Maison evanegline todos os direitos
+    </footer>
+
+</body>
+</html>
