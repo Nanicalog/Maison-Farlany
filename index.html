@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sapataria Online</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            text-align: center;
+        }
+        form {
+            max-width: 400px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        input, button {
+            width: 100%;
+            margin: 10px 0;
+            padding: 10px;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Sapataria Online</h1>
+    <h2>Adicionar Sapato</h2>
+
+    <form id="sapatoForm">
+        <label for="nome">Nome do Sapato:</label>
+        <input type="text" id="nome" name="nome" required>
+        
+        <label for="preco">Preço:</label>
+        <input type="number" id="preco" name="preco" required>
+
+        <button type="submit">Adicionar Sapato</button>
+    </form>
+
+    <p id="mensagem"></p>
+
+    <script>
+        document.getElementById("sapatoForm").addEventListener("submit", async function(event) {
+            event.preventDefault();
+
+            const nome = document.getElementById("nome").value;
+            const preco = document.getElementById("preco").value;
+
+            const response = await fetch("http://localhost:8000/sapatos", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ nome, preco })
+            });
+
+            const result = await response.json();
+            document.getElementById("mensagem").textContent = result.mensagem;
+        });
+    </script>
+
+</body>
+</html>
