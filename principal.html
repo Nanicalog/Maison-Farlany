@@ -7,6 +7,7 @@
     <title>Velvet - Shoes</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        /*estilização*/
         body {
             font-family: 'Playfair Display', serif;
             color: #590202;
@@ -18,7 +19,7 @@
         /* Cabeçalho elegante */
         header {
             background-color: #590202;
-            padding: 3rem 0;
+            padding: 3rem 0;  /*Espaçamento interno*/
             text-align: center;
             position: relative;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -35,18 +36,23 @@
             position: relative;
             display: inline-block;
         }
-
-        h1:after {
-            content: '';
+        .nav-link {
             position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80px;
-            height: 3px;
-            background-color: #e8e2d9;
+            right: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 1.2rem;
+            padding: 0.5rem 1rem;
+            border: 1px solid #ffffff;
+            border-radius: 4px;
+            transition: all 0.3s ease;
         }
-
+        .nav-link:hover {
+            background-color: #ffffff;
+            color: #590202;
+        }
         /* Conteúdo principal */
         .conteudo {
             max-width: 1200px;
@@ -98,6 +104,8 @@
     <!-- Cabeçalho do site -->
     <header>
         <h1>Velvet</h1>
+        <!-- Link para a página de listagem no cabeçalho -->
+        <a href="/index.html" class="nav-link">Produtos</a>
     </header>
 
     <!-- Conteúdo principal -->
@@ -105,9 +113,6 @@
         <!-- Imagem de destaque -->
         <img src="https://us.christianlouboutin.com/media/wysiwyg/landing-pages/KATE-THE-ICONIC-PUMP-PHOTO-FULL-WIDTH-2.jpg"
             alt="Sapat" class="destaque-imagem">
-
-        <!-- link para a página de listagem -->
-        <a href="/index.html">Conferir Listagem de Produtos</a>
 
     <!-- Vídeo de fundo em tela cheia -->
     <video autoplay muted loop id="videoFundo">
@@ -121,3 +126,21 @@
 </body>
 
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
