@@ -15,3 +15,4 @@ coloquei os comentarios do que cada coisa faz; fiz o script que busca os dados d
 #coloquei oc comentarios no código
 #parou de listar estou tentando resolver provavelmente as dependencias são dando erro de novo
 #troquei dê pasta de novo porque a porcaria do vs code não roda meu código, vou por em outro arquivo para ver se funciona
+#eu pedir ajuda ao chat para mexer no erro que está sendo recorrente, pedi para ele arrumar o arquivo de maneira que o método post funcione
