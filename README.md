@@ -14,3 +14,4 @@ coloquei os comentarios do que cada coisa faz; fiz o script que busca os dados d
 #no mysl criei o banco de dados chamado sapatos_db e tabela sapatos_
 #coloquei oc comentarios no código
 #parou de listar estou tentando resolver provavelmente as dependencias são dando erro de novo
+#troquei dê pasta de novo porque a porcaria do vs code não roda meu código, vou por em outro arquivo para ver se funciona
