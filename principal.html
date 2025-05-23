@@ -1,70 +1,123 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
-    <title>Cherry</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
- <style>
-       body {
-    font-family: 'Playfair Display', serif; /* Agora está aplicado em todo o corpo */
-    color: #590202;
-    margin: 0;
-    padding: 0;
-     }
-        /* Cabeçalho*/
-    header {
-    background-color: #590202;
-    visibility: hidden;
-    padding: 2rem 0;
-    text-align: center;
-    border-bottom: 1px solid #e8e2d9;
-    margin-bottom: 3rem;
-    }
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Velvet - Shoes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Playfair Display', serif;
+            color: #590202;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f5f2;
+        }
 
-     h1 {
-    font-family: 'Playfair Display', serif;
-    font-weight: 700;
-    font-size: 3.5rem;
-    color: #3a2e26;
-    letter-spacing: 2px;
-    margin: 0;
-    position: relative;
-    display: inline-block;
-     }
-       /*rodapé*/
-        footer{
+        /* Cabeçalho elegante */
+        header {
             background-color: #590202;
-              visibility: hidden;
-            color: #fffefe;
-            padding: 20px 0;
+            padding: 3rem 0;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            font-size: 4rem;
+            color: #ffffff;
+            letter-spacing: 4px;
+            margin: 0;
+            text-transform: uppercase;
+            position: relative;
+            display: inline-block;
+        }
+
+        h1:after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background-color: #e8e2d9;
+        }
+
+        /* Conteúdo principal */
+        .conteudo {
+            max-width: 1200px;
+            margin: 4rem auto;
+            padding: 0 2rem;
             text-align: center;
         }
-     /* Estilo para o vídeo ocupar a tela toda como fundo */
-       #videoFundo {
-         position: fixed; /* fixa na tela */
-        top: 0;
-        left: 0;
-        width: 100vw;/* largura total da tela */
-        height: 100vh;/* altura total da tela */
-        object-fit: cover;/* cobre toda a área sem distorcer */
-        z-index: -1;/* fica atrás de todo o conteúdo */
-       }
+
+        /* Imagem com bordas arredondadas */
+        .destaque-imagem {
+            width: 100%;
+            max-width: 600px;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            margin: 0 auto;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+
+        .destaque-imagem:hover {  /* Imagem com se pula quando passa o mouse */
+            transform: scale(1.02);
+        } 
+
+        /* Rodapé */
+        footer {
+            background-color: #590202;
+            color: #fffefe;
+            padding: 2rem 0;
+            text-align: center;
+            margin-top: 4rem;
+        }
+
+        /* Vídeo de fundo */
+        #videoFundo {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+            z-index: -1;
+            opacity: 0.3;
+            /* Mais transparente para melhor legibilidade */
+        }
     </style>
 </head>
-<body>
 
+<body>
     <!-- Cabeçalho do site -->
     <header>
-        <h1>Cherry Pie</h1>
+        <h1>Velvet</h1>
     </header>
-<!-- Vídeo de fundo em tela cheia -->
-<video autoplay muted loop id="videoFundo"> <!-- Deixa o vídeo sem som (muted); loop(faz o videio recomeçar de novo)-->
 
-    <source src="https://cdn.cosmos.so/75f42abb-79b7-4bbb-91ca-2f9b52ec8d0d.mp4" type="video/mp4">
-</video>
+    <!-- Conteúdo principal -->
+    <div class="conteudo">
+        <!-- Imagem de destaque -->
+        <img src="https://us.christianlouboutin.com/media/wysiwyg/landing-pages/KATE-THE-ICONIC-PUMP-PHOTO-FULL-WIDTH-2.jpg"
+            alt="Sapat" class="destaque-imagem">
+
+        <!-- link para a página de listagem -->
+        <a href="/index.html">Conferir Listagem de Produtos</a>
+
+    <!-- Vídeo de fundo em tela cheia -->
+    <video autoplay muted loop id="videoFundo">
+        <source src="https://cdn.cosmos.so/75f42abb-79b7-4bbb-91ca-2f9b52ec8d0d.mp4" type="video/mp4">
+    </video>
+
+    <!-- Rodapé -->
     <footer>
-        2025 Maison evanegline todos os direitos
+        &copy; 2025 Maison Evangeline. Todos os direitos reservados.
     </footer>
-
 </body>
+
 </html>
