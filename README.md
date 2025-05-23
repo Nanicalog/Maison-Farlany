@@ -3,6 +3,9 @@
 coloquei os comentarios do que cada coisa faz; fiz o script que busca os dados do backend
 #coloquei um vídeo no HTML pesquisei no Google como fazia;
 #estou tentando arrumar o erro que eu fiz, provavvelmente e erro e digitação
+#fiz os metodo crud (Create, Read, Update, Delete)
+#Modal de confirmação para o usuário confirma exclusão de itens
+mensagens de feedback, tratamento de erros;
 #fiz a importação com o mysql(mas ainda ta dando errou vou mexer de novo; fiz a importação do fastify/cors; a inicialização do servidor; função para criar uma conexão com o banci mysql; rota para listar todos os produtos da tabela do meu banquinho de dados; criei a conexão com o banco;  extrair paramentrod da string e da query;
 #coloquei imagem na página referente ao tema;
 #escolhi uma fonte no Google fontes e o importei ela na página;
