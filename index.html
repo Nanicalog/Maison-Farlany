@@ -7,7 +7,6 @@
     <title>Listagem de Sapatos - Velvet</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* Estilos gerais da página */
         body {
             font-family: 'Playfair Display', serif;
             margin: 0;
@@ -18,7 +17,6 @@
             z-index: 1;
         }
 
-        /* Estilo do formulário */
         form {
             max-width: 400px;
             margin: 20px auto;
@@ -29,9 +27,7 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
-        /* Estilo dos inputs e botões */
-        input,
-        button {
+        input, button {
             width: 100%;
             margin: 10px 0;
             padding: 12px;
@@ -40,7 +36,6 @@
             border: 1px solid #ddd;
         }
 
-        /* Estilo do botão principal */
         button {
             background-color: #8C0808;
             color: white;
@@ -54,44 +49,16 @@
             background-color: #590202;
         }
 
-        /* Estilo da lista de sapatos */
         #listaSapatos {
             max-width: 800px;
             margin: 30px auto;
             text-align: left;
         }
 
-        .sapato-item {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: white;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .sapato-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .sapato-actions button {
-            width: auto;
-            padding: 8px 15px;
-        }
-
-        .edit-btn {
-            background-color: #2c7be5;
-        }
-
         .delete-btn {
             background-color: #e63757;
         }
 
-        /* Mensagens */
         #mensagem {
             margin: 20px 0;
             padding: 10px;
@@ -108,7 +75,6 @@
             color: #721c24;
         }
 
-        /* Vídeo de fundo */
         #videoFundo {
             position: fixed;
             top: 0;
@@ -116,37 +82,8 @@
             width: 100vw;
             height: 100vh;
             object-fit: cover;
-            z-index: -1;
-            opacity: 0.5;
-        }
-
-        /* Modal */
-        .modal { /*define o estilo básico do modal*/
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 100;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            width: 400px;
-            max-width: 90%;
-        }
-
-        .modal-buttons {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 20px;
+            z-index: -1;   /* fica atrás do conteúdo */
+            opacity: 0.5; /*deixa o a opacidadade*/
         }
     </style>
 </head>
@@ -154,246 +91,95 @@
 <body>
     <h1>Listagem de Sapatos - Velvet</h1>
 
-    <!-- Formulário para adicionar/editar sapatos -->
-    <form id="sapatoForm">
+    <form id="sapatoForm"> <!--formulario para adiconar os itens-->
         <input type="hidden" id="sapatoId">
         <label for="nome">Nome do Sapato:</label>
         <input type="text" id="nome" name="nome" required>
-
         <label for="preco">Preço:</label>
         <input type="number" id="preco" name="preco" step="0.01" required>
-
         <button type="submit" id="submitBtn">Adicionar Sapato</button>
     </form>
 
-    <!-- Mensagem de feedback -->
-    <div id="mensagem"></div>
-
-    <!-- Lista de sapatos -->
-    <h2>Sapatos Disponíveis</h2>
-    <div id="listaSapatos"></div>
-
-    <!-- Modal de confirmação -->
-   
-    <!--aparece  a mensagem quando o usuário tenta apagar um sapato do sistema.-->
-    <div id="confirmModal" class="modal"> <!--confirmModal: ID único que identifica este modal no JavaScript-->
-        <div class="modal-content">
-            <p>Tem certeza que deseja excluir este sapato?</p> 
-            <div class="modal-buttons">
-                <button id="cancelBtn">Cancelar</button> <!--Fecha o modal sem executar a exclusão-->
-                <button id="confirmBtn" class="delete-btn">Confirmar</button> <!-- Executa a exclusão do registro no banco de dados-->
-            </div>
-        </div>
-    </div>
-
-    <!-- Vídeo de fundo -->
-    <video autoplay muted loop id="videoFundo">
+    <div id="mensagem"></div> <!--mensaegem de sucesso -->
+    <video autoplay muted loop id="videoFundo"> <!--video de fundo -->
         <source src="https://cdn.cosmos.so/75f42abb-79b7-4bbb-91ca-2f9b52ec8d0d.mp4" type="video/mp4">
     </video>
 
     <script>
-        // Variáveis globais
-        let sapatoAtualId = null;
-        const modal = document.getElementById('confirmModal');
-        const confirmBtn = document.getElementById('confirmBtn');
-        const cancelBtn = document.getElementById('cancelBtn');
-
-        // Função para exibir mensagem
+            // Função para mostrar mensagens na tela (sucesso ou erro)
         function mostrarMensagem(texto, tipo) {
             const mensagem = document.getElementById('mensagem');
-            mensagem.textContent = texto;
-            mensagem.className = tipo;
-            mensagem.style.display = 'block';
-
+            mensagem.textContent = texto; //define texto da mensagem
+            mensagem.className = tipo; // Define a classe para estilo (success ou error)
+            mensagem.style.display = 'block';  //exibe a mensagem
             setTimeout(() => {
                 mensagem.style.display = 'none';
-            }, 3000);
+            }, 8000);
         }
-
-        // Função para carregar a lista de sapatos
-        async function carregarSapatos() { /* lidar com operações que podem demorar*/
+         // Função para carregar a lista de sapatos do backend via API
+        async function carregarSapatos() {
             try {
-                const response = await fetch("http://localhost:8000/sapatos"); /*Faz uma requisição  GET para o endereço do seu servidor*/
+                // Faz a requisição para obter a lista de sapatos
+                const res = await fetch(`${apiBase}/sapatos`);
+                if (!res.ok) throw new Error('Erro ao carregar sapatos');
+                const sapatos = await res.json();
 
-                if (!response.ok) {  // Verifica se a resposta foi bem-sucedida
-                    throw new Error('Erro ao carregar sapatos');
-                }
-                   // Converte resposta para JSON
-                const sapatos = await response.json();
-                const lista = document.getElementById('listaSapatos');
-                lista.innerHTML = '';
-              // Verifica se há sapatos cadastrados
-                if (sapatos.length === 0) {
-                    lista.innerHTML = '<p>Nenhum sapato cadastrado ainda.</p>';
-                    return;
-                }
+                // Limpa o conteúdo anterior da lista
+                tabelaBody.innerHTML = '';
 
-                 // Para cada sapato, cria um item na lista
-                sapatos.forEach(sapato => {  //Cria um novo elemento div para cada sapato na lista
-                    const item = document.createElement('div');
-                    item.className = 'sapato-item'; // Adiciona a classe 'sapato-item' ao div criado (para aplicar os estilos CSS)
-                   
-                    /// Define o conteúdo HTML interno do div usando template literals (permite inserir variáveis)
-                    item.innerHTML = ` 
-                    <!-- Exibe o nome do sapato em negrito -->
-                        <div>
-                            <strong>${sapato.nome}</strong>  <!-- Exibe o preço formatado com 2 casas decimais e prefixo R$ -->
-                            <p>R$ ${sapato.preco.toFixed(2)}</p>
-                        </div>
-                        <div class="sapato-actions">
-                            <button class="edit-btn" data-id="${sapato.id}">Editar</button> 
-                            <button class="delete-btn" data-id="${sapato.id}">Excluir</button>
-                        </div>
+                // Para cada sapato, cria uma linha na tabela com nome e preço formatado
+                sapatos.forEach(sapato => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${sapato.nome}</td>
+                        <td>${parseFloat(sapato.preco).toFixed(2)}</td>
                     `;
-                    lista.appendChild(item); // Adiciona os elementos dos sapatos (nome, preço
+                    tabelaBody.appendChild(tr);
                 });
 
-                // Adicionar eventos aos botões
-                document.querySelectorAll('.edit-btn').forEach(btn => { 
-                }); //busca todos os elementos com classe 'edit-btn'
-
-                document.querySelectorAll('.delete-btn').forEach(btn => {
-                    btn.addEventListener('click', mostrarModalConfirmacao);
-                }); //é o seletor CSS que encontra todos os elementos com a classe delete-btn
-            } catch (error) {
-                console.error('Erro ao carregar sapatos:', error);
-                mostrarMensagem('Erro ao carregar lista de sapatos', 'error');
-            }
-        }
-
-        // Função chamada quando clica no botão Editar
-        async function editarSapato(event) {
-            // Obtém o ID do sapato do atributo data-id do botão clicado
-            const id = event.target.getAttribute('data-id');
-
-            try {
-                // Busca os dados do sapato na API
-                const response = await fetch(`http://localhost:8000/sapatos/${id}`);
-
-                if (!response.ok) {
-                    throw new Error('Erro ao buscar sapato');
+                // Caso não tenha sapatos, mostra mensagem na tabela
+                if (sapatos.length === 0) {
+                    tabelaBody.innerHTML = '<tr><td colspan="2">Nenhum sapato cadastrado.</td></tr>';
                 }
-
-                // Converte a resposta para JSON
-                const sapato = await response.json();
-
-                // Preenche o formulário com os dados do sapato
-                document.getElementById('sapatoId').value = sapato.id;
-                document.getElementById('nome').value = sapato.nome;
-                document.getElementById('preco').value = sapato.preco;
-                // Muda o texto do botão para "Atualizar"
-                document.getElementById('submitBtn').textContent = 'Atualizar Sapato';
-
-                // Rolagem suave até o formulário
-                document.getElementById('sapatoForm').scrollIntoView({ behavior: 'smooth' });
-            } catch (error) {
-                console.error('Erro ao editar sapato:', error);
-                mostrarMensagem('Erro ao carregar sapato para edição', 'error');
+            } catch (err) {
+                mostrarMensagem(err.message, 'error'); // Exibe erro na tela
             }
         }
 
-        // Função chamada quando clica no botão Excluir
-        function mostrarModalConfirmacao(event) {
-            // Armazena o ID do sapato a ser excluído
-            sapatoAtualId = event.target.getAttribute('data-id');
-            // Mostra o modal de confirmação
-            modal.style.display = 'flex';
-        }
+        // Evento para interceptar o envio do formulário
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault(); // Evita que a página recarregue
 
-        // Função que executa a exclusão do sapato
-        async function excluirSapato() {
+            // Pega os valores digitados pelo usuário e remove espaços extras
+            const nome = form.nome.value.trim();
+            const preco = form.preco.value.trim();
+
+            // Validação simples para garantir que os campos não estão vazios
+            if (!nome || !preco) {
+                mostrarMensagem('Preencha todos os campos', 'error');
+                return;
+            }
+
             try {
-                // Envia requisição DELETE para a API
-                const response = await fetch(`http://localhost:8000/sapatos/${sapatoAtualId}`, {
-                    method: 'DELETE'
+                // Envia os dados para a API via método POST em formato JSON
+                const res = await fetch(`${apiBase}/sapatos`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nome, preco: parseFloat(preco) })
                 });
 
-                if (!response.ok) {
-                    throw new Error('Erro ao excluir sapato');
-                }
+                const data = await res.json();
+                // Se resposta não for OK, lança erro com mensagem da API
+                if (!res.ok) throw new Error(data.erro || 'Erro ao adicionar sapato');
 
-                // Feedback visual para o usuário
-                mostrarMensagem('Sapato excluído com sucesso', 'success');
-                // Recarrega a lista atualizada
-                await carregarSapatos();
-            } catch (error) {
-                console.error('Erro ao excluir sapato:', error);
-                mostrarMensagem('Erro ao excluir sapato', 'error');
-            } finally {
-                // Executa independente de ter dado erro ou não
-                modal.style.display = 'none'; // Fecha o modal
-                sapatoAtualId = null; // Limpa o ID armazenado
-            }
-        }
-
-        // Evento de envio do formulário (adicionar/editar)
-        document.getElementById('sapatoForm').addEventListener('submit', async function (event) {
-            event.preventDefault(); // Impede o comportamento padrão do formulário
-
-            // Obtém os valores dos campos
-            const id = document.getElementById('sapatoId').value;
-            const nome = document.getElementById('nome').value;
-            const preco = document.getElementById('preco').value;
-            // Verifica se está editando (tem ID) ou adicionando novo
-            const isEditando = !!id;
-
-            try {
-                let response;
-
-                if (isEditando) {
-                    // Se está editando, envia PUT para atualizar
-                    response = await fetch(`http://localhost:8000/sapatos/${id}`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json' // Define o tipo de conteúdo
-                        },
-                        body: JSON.stringify({ nome, preco }) // Converte os dados para JSON
-                    });
-                } else {
-                    // Se é novo, envia POST para criar
-                    response = await fetch('http://localhost:8000/sapatos', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ nome, preco })
-                    });
-                }
-
-                // Verifica se a requisição foi bem-sucedida
-                if (!response.ok) {
-                    throw new Error(isEditando ? 'Erro ao atualizar sapato' : 'Erro ao adicionar sapato');
-                }
-
-                // Processa a resposta da API
-                const result = await response.json();
-                // Mostra mensagem de sucesso (da API ou padrão)
-                mostrarMensagem(result.mensagem || 'Operação realizada com sucesso', 'success');
-
-                // Limpa o formulário após o envio
-                this.reset();
-                document.getElementById('sapatoId').value = '';
-                // Volta o texto do botão para "Adicionar Sapato"
-                document.getElementById('submitBtn').textContent = 'Adicionar Sapato';
-
-                // Recarrega a lista para mostrar as alterações
-                await carregarSapatos();
-            } catch (error) {
-                console.error('Erro:', error);
-                mostrarMensagem(error.message, 'error');
+                mostrarMensagem(data.mensagem, 'success'); // Mostra mensagem de sucesso
+                form.reset(); // Limpa o formulário
+                carregarSapatos(); // Atualiza a lista de sapatos na tela
+            } catch (err) {
+                mostrarMensagem(err.message, 'error'); // Exibe erro na tela
             }
         });
-
-        // Configura o evento do botão Confirmar no modal
-        confirmBtn.addEventListener('click', excluirSapato);
-        
-        // Configura o evento do botão Cancelar no modal
-        cancelBtn.addEventListener('click', () => {
-            modal.style.display = 'none'; // Fecha o modal
-            sapatoAtualId = null; // Limpa o ID armazenado
-        });
-
-        // Quando a página terminar de carregar, carrega a lista de sapatos
-        document.addEventListener('DOMContentLoaded', carregarSapatos);
+        // Carrega os sapatos automaticamente quando a página termina de carregar
+        window.onload = carregarSapatos;
     </script>
-    </body>
+</body>
