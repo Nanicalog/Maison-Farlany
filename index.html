@@ -106,62 +106,72 @@
     </video>
 
     <script>
-            // Função para mostrar mensagens na tela (sucesso ou erro)
+            // Função para mostrar mensagens na tela (recebe um parâmetro do tipo texto (sucesso ou erro)
+
         function mostrarMensagem(texto, tipo) {
-            const mensagem = document.getElementById('mensagem');
-            mensagem.textContent = texto; //define texto da mensagem
+            const mensagem = document.getElementById('mensagem'); //busca elementos HTML com o id mensagem 
+            mensagem.textContent = texto; //define o conteúdo de texto da mensagem 
+
             mensagem.className = tipo; // Define a classe para estilo (success ou error)
-            mensagem.style.display = 'block';  //exibe a mensagem
+            mensagem.style.display = 'block';  //mostra a mensagem
+
             setTimeout(() => {
                 mensagem.style.display = 'none';
             }, 8000);
-        }
-         // Função para carregar a lista de sapatos do backend via API
+        } //depois de 8 segundos esconde a mensagem 
+
+         // Função para carregar a lista de sapatos do backend via API:
+
         async function carregarSapatos() {
             try {
-                // Faz a requisição para obter a lista de sapatos
-                const res = await fetch(`${apiBase}/sapatos`);
-                if (!res.ok) throw new Error('Erro ao carregar sapatos');
-                const sapatos = await res.json();
+                // função para assíncrona "carregarSapatos", que vai usar o await para lidar com as requisições 
 
-                // Limpa o conteúdo anterior da lista
-                tabelaBody.innerHTML = '';
+                const res = await fetch(`${apiBase}/sapatos`); // faz requisição pra api obter a lista dos sapatos (Get)
 
-                // Para cada sapato, cria uma linha na tabela com nome e preço formatado
+                if (!res.ok) throw new Error('Erro ao carregar sapatos'); // lança um erro (200)
+
+                const sapatos = await res.json(); //converte a resposta em Jason para api em onj javascript (no caos a lista de sapato)
+
+                tabelaBody.innerHTML = ''; //limpa o conteúdo atual da tabela
+
                 sapatos.forEach(sapato => {
-                    const tr = document.createElement('tr');
+                    const tr ={ //para casa sapato retornando na api, executa o código de baixo:
+
+ document.createElement('tr'); //cria uma nova linha na tabela 
                     tr.innerHTML = `
                         <td>${sapato.nome}</td>
                         <td>${parseFloat(sapato.preco).toFixed(2)}</td>
-                    `;
-                    tabelaBody.appendChild(tr);
-                });
+                    `; //define células da linha com nome e preço do sapato
 
-                // Caso não tenha sapatos, mostra mensagem na tabela
+                    tabelaBody.appendChild(tr);
+                }); // add nova linha na tabela
+
+                // se não tiver o sapatos, mostra mensagem na tabela
                 if (sapatos.length === 0) {
                     tabelaBody.innerHTML = '<tr><td colspan="2">Nenhum sapato cadastrado.</td></tr>';
                 }
             } catch (err) {
-                mostrarMensagem(err.message, 'error'); // Exibe erro na tela
+                mostrarMensagem(err.message, 'error'); // Exibe erro na tela se a API falhar 
             }
-        }
+        } 
 
         // Evento para interceptar o envio do formulário
         form.addEventListener('submit', async (e) => {
             e.preventDefault(); // Evita que a página recarregue
 
-            // Pega os valores digitados pelo usuário e remove espaços extras
+            // Pega os valores digitados pelo usuário e remove espaços em branco 
             const nome = form.nome.value.trim();
             const preco = form.preco.value.trim();
 
-            // Validação simples para garantir que os campos não estão vazios
+            // 
             if (!nome || !preco) {
                 mostrarMensagem('Preencha todos os campos', 'error');
                 return;
-            }
+            } //aparece a a msm "preencha os campos"
 
             try {
-                // Envia os dados para a API via método POST em formato JSON
+
+                // Envia os dados para a API pelo método POST em formato JSON
                 const res = await fetch(`${apiBase}/sapatos`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -169,16 +179,21 @@
                 });
 
                 const data = await res.json();
-                // Se resposta não for OK, lança erro com mensagem da API
-                if (!res.ok) throw new Error(data.erro || 'Erro ao adicionar sapato');
+                //converte a resposta de API em obj Jason
 
-                mostrarMensagem(data.mensagem, 'success'); // Mostra mensagem de sucesso
+                if (!res.ok) throw new Error(data.erro || 'Erro ao adicionar sapato'); //se a resposta não for ok lança um erro com a msm recebida pela API
+
+                mostrarMensagem(data.mensagem, 'success'); // Mostra mensagem de sucesso da API
+
                 form.reset(); // Limpa o formulário
+
                 carregarSapatos(); // Atualiza a lista de sapatos na tela
+
             } catch (err) {
                 mostrarMensagem(err.message, 'error'); // Exibe erro na tela
             }
         });
+
         // Carrega os sapatos automaticamente quando a página termina de carregar
         window.onload = carregarSapatos;
     </script>
