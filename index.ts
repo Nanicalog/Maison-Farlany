@@ -84,17 +84,17 @@ app.get('/Sapatos', async (request: FastifyRequest, reply: FastifyReply) => {
     }
 
     try {
-        // Cria conexão com o banco
+        //cria conexão com o banco
         conn = await createDatabaseConnection();
 
-        // Executa a query parametrizada
-        const [rows] = await conn.query<any>(query, values);
+        //executa a query parametrizada
+        const [rows] = await conn.query<any>(query, values); /*ela relaciona la com a conexão mysql2/promise*/
 
         if (rows.length > 0) {
-            // Retorna os resultados encontrados
+            //retorna os resultados encontrados
             reply.status(200).send(rows);
         } else {
-            // Caso nenhum resultado encontrado, informa ao cliente
+            //caso nenhum resultado seja encontrado, lança a mensagem:
             reply.status(404).send({ mensagem: "ESSE PRODUTO NÃO EXISTE" });
         }
     } catch (erro: any) {
@@ -115,18 +115,18 @@ app.get('/Sapatos', async (request: FastifyRequest, reply: FastifyReply) => {
             reply.status(500).send({ mensagem: "Erro interno no servidor ao buscar o sapato." });
         }
     } finally {
-        // Fecha a conexão com o banco
+        //fecha a conexão com o banco
         if (conn) {
             await conn.end();
         }
     }
 });
 
-// Inicializa o servidor Fastify na porta 8000
+//inicializa o servidor Fastify na porta 8000
 app.listen({ port: 8000 }, (err, address) => {
     if (err) {
         console.error("Erro ao iniciar servidor:", err);
         process.exit(1); // Sai do processo em caso de erro
     }
-    console.log(`Servidor ouvindo em ${address}`);
+    console.log(`Servidor ouvindo em ${address}`); /*mensagem no terminal*/
 });

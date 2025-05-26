@@ -7,126 +7,128 @@ const app = fastify();
 // Registra o plugin CORS para permitir requisições de outras origens
 app.register(cors);
 
-// Função para criar uma conexão com o banco de dados 
+// Função para criar uma conexão com o banco de dados
 async function createDatabaseConnection(): Promise<Connection> {
     return await mysql.createConnection({
-        host: 'localhost',
-        user: 'root',
-        password: '',
-        database: 'sapatos'
+    host: 'localhost',
+    user: 'root',
+    password: '',
+    database: 'sapatos'
     });
-}
-// Rota para buscar todos os sapatos cadastrados no banco
-app.get('/sapatos', async (request: FastifyRequest, reply: FastifyReply) => {
+    }
+    // Rota para buscar todos os sapatos cadastrados no banco
+    app.get('/sapatos', async (request: FastifyRequest, reply: FastifyReply) => {
     let conn: Connection | null = null;
 
     try {
-        // Cria a conexão com o banco
-        conn = await createDatabaseConnection();
+    // Cria a conexão com o banco
+    conn = await createDatabaseConnection();
 
-        // Executa a consulta SQL para listar os sapatos (atenção ao nome da tabela e da query)
-        const [rows] = await conn.query<any>("SELECT * lista");
+    // Executa a consulta SQL para listar os sapatos (atenção ao nome da tabela e da query)
+    const [rows] = await conn.query<any>("SELECT * lista");
 
         // Retorna os resultados para o cliente
         reply.status(200).send(rows);
 
-    } catch (erro: any) {
+        } catch (erro: any) {
         console.error("Erro ao listar produto:", erro);
 
         // Tratamento de erros específicos do MySQL para mensagens amigáveis
         if (erro.code === 'ECONNREFUSED') {
-            reply.status(400).send({ mensagem: "ERRO: LIGUE O LARAGAO => Conexão Recusada" });
+        reply.status(400).send({ mensagem: "ERRO: LIGUE O LARAGAO => Conexão Recusada" });
         } else if (erro.code === 'ER_BAD_DB_ERROR') {
-            reply.status(400).send({ mensagem: "ERRO: CRIE UM BANCO DE DADOS COM O NOME DEFINIDO NA CONEXÃO" });
+        reply.status(400).send({ mensagem: "ERRO: CRIE UM BANCO DE DADOS COM O NOME DEFINIDO NA CONEXÃO" });
         } else if (erro.code === 'ER_ACCESS_DENIED_ERROR') {
-            reply.status(400).send({ mensagem: "ERRO: CONFERIR O USUÁRIO E SENHA DEFINIDOS NA CONEXÃO" });
+        reply.status(400).send({ mensagem: "ERRO: CONFERIR O USUÁRIO E SENHA DEFINIDOS NA CONEXÃO" });
         } else if (erro.code === 'ER_NO_SUCH_TABLE') {
-            reply.status(400).send({ mensagem: "ERRO: Você deve criar a tabela com o mesmo nome da sua QUERY" });
+        reply.status(400).send({ mensagem: "ERRO: Você deve criar a tabela com o mesmo nome da sua QUERY" });
         } else if (erro.code === 'ER_PARSE_ERROR') {
-            reply.status(400).send({ mensagem: "ERRO: Você tem um erro de escrita em sua QUERY confira: VÍRGULAS, PARENTESES E NOME DE COLUNAS" });
+        reply.status(400).send({ mensagem: "ERRO: Você tem um erro de escrita em sua QUERY confira: VÍRGULAS, PARENTESES
+        E NOME DE COLUNAS" });
         } else {
-            reply.status(500).send({ mensagem: "ERRO: NÃO IDENTIFICADO" }); // Erro genérico
+        reply.status(500).send({ mensagem: "ERRO: NÃO IDENTIFICADO" }); // Erro genérico
         }
-    } finally {
+        } finally {
         // Fecha a conexão com o banco, se aberta
         if (conn) {
-            await conn.end();
+        await conn.end();
         }
-    }
-});
+        }
+        });
 
-// Rota para buscar sapatos por nome e/ou preço
-app.get('/Sapatos', async (request: FastifyRequest, reply: FastifyReply) => {
-    let conn: Connection | null = null;
+        // Rota para buscar sapatos por nome e/ou preço
+        app.get('/Sapatos', async (request: FastifyRequest, reply: FastifyReply) => {
+        let conn: Connection | null = null;
 
-    // Pega os parâmetros da query string
-    const { nome, preco } = request.query as { nome?: string; preco?: string };
+        // Pega os parâmetros da query string
+        const { nome, preco } = request.query as { nome?: string; preco?: string };
 
-    // Se nenhum parâmetro for passado, retorna erro
-    if (!nome && !preco) {
+        // Se nenhum parâmetro for passado, retorna erro
+        if (!nome && !preco) {
         return reply.status(400).send({ mensagem: "Por favor, forneça o nome ou o preço do sapato para buscar." });
-    }
+        }
 
-    // Monta a query inicial, usando "WHERE 1=1" para facilitar concatenação condicional
-    let query = "SELECT * FROM sapatos_db WHERE 1=1";
-    const values: any[] = [];
+        // Monta a query inicial, usando "WHERE 1=1" para facilitar concatenação condicional
+        let query = "SELECT * FROM sapatos_db WHERE 1=1";
+        const values: any[] = [];
 
-    // Se nome foi passado, adiciona na query com LIKE para busca parcial
-    if (nome) {
+        // Se nome foi passado, adiciona na query com LIKE para busca parcial
+        if (nome) {
         query += " AND nome LIKE ?";
         values.push(`%${nome}%`);
-    }
+        }
 
-    // Se preco foi passado, adiciona na query para busca exata no preço
-    if (preco) {
+        // Se preco foi passado, adiciona na query para busca exata no preço
+        if (preco) {
         query += " AND preco = ?";
         values.push(preco);
-    }
+        }
 
-    try {
-        // Cria conexão com o banco
+        try {
+        //cria conexão com o banco
         conn = await createDatabaseConnection();
 
-        // Executa a query parametrizada
-        const [rows] = await conn.query<any>(query, values);
+        //executa a query parametrizada
+        const [rows] = await conn.query<any>(query, values); /*ela relaciona la com a conexão mysql2/promise*/
 
-        if (rows.length > 0) {
-            // Retorna os resultados encontrados
+            if (rows.length > 0) {
+            //retorna os resultados encontrados
             reply.status(200).send(rows);
-        } else {
-            // Caso nenhum resultado encontrado, informa ao cliente
+            } else {
+            //caso nenhum resultado seja encontrado, lança a mensagem:
             reply.status(404).send({ mensagem: "ESSE PRODUTO NÃO EXISTE" });
-        }
-    } catch (erro: any) {
-        console.error("Erro ao buscar sapato por nome e preco:", erro);
+            }
+            } catch (erro: any) {
+            console.error("Erro ao buscar sapato por nome e preco:", erro);
 
-        // Tratamento de erros MySQL para mensagens amigáveis
-        if (erro.code === 'ECONNREFUSED') {
+            // Tratamento de erros MySQL para mensagens amigáveis
+            if (erro.code === 'ECONNREFUSED') {
             reply.status(400).send({ mensagem: "ERRO: LIGUE O LARAGAO => Conexão Recusada" });
-        } else if (erro.code === 'ER_BAD_DB_ERROR') {
+            } else if (erro.code === 'ER_BAD_DB_ERROR') {
             reply.status(400).send({ mensagem: "ERRO: CRIE UM BANCO DE DADOS COM O NOME DEFINIDO NA CONEXÃO" });
-        } else if (erro.code === 'ER_ACCESS_DENIED_ERROR') {
+            } else if (erro.code === 'ER_ACCESS_DENIED_ERROR') {
             reply.status(400).send({ mensagem: "ERRO: CONFERIR O USUÁRIO E SENHA DEFINIDOS NA CONEXÃO" });
-        } else if (erro.code === 'ER_NO_SUCH_TABLE') {
+            } else if (erro.code === 'ER_NO_SUCH_TABLE') {
             reply.status(400).send({ mensagem: "ERRO: Você deve criar a tabela com o mesmo nome da sua QUERY" });
-        } else if (erro.code === 'ER_PARSE_ERROR') {
-            reply.status(400).send({ mensagem: "ERRO: Você tem um erro de escrita em sua QUERY confira: VÍRGULAS, PARENTESES E NOME DE COLUNAS" });
-        } else {
+            } else if (erro.code === 'ER_PARSE_ERROR') {
+            reply.status(400).send({ mensagem: "ERRO: Você tem um erro de escrita em sua QUERY confira: VÍRGULAS,
+            PARENTESES E NOME DE COLUNAS" });
+            } else {
             reply.status(500).send({ mensagem: "Erro interno no servidor ao buscar o sapato." });
-        }
-    } finally {
-        // Fecha a conexão com o banco
-        if (conn) {
+            }
+            } finally {
+            //fecha a conexão com o banco
+            if (conn) {
             await conn.end();
-        }
-    }
-});
+            }
+            }
+            });
 
-// Inicializa o servidor Fastify na porta 8000
-app.listen({ port: 8000 }, (err, address) => {
-    if (err) {
-        console.error("Erro ao iniciar servidor:", err);
-        process.exit(1); // Sai do processo em caso de erro
-    }
-    console.log(`Servidor ouvindo em ${address}`);
-});
+            //inicializa o servidor Fastify na porta 8000
+            app.listen({ port: 8000 }, (err, address) => {
+            if (err) {
+            console.error("Erro ao iniciar servidor:", err);
+            process.exit(1); // Sai do processo em caso de erro
+            }
+            console.log(`Servidor ouvindo em ${address}`); /*mensagem no terminal*/
+            });
