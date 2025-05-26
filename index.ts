@@ -10,10 +10,10 @@ app.register(cors);
 // Função para criar uma conexão com o banco de dados 
 async function createDatabaseConnection(): Promise<Connection> {
     return await mysql.createConnection({
-        host: 'localhost', 
-        user: 'root',         
-        password: '',          
-        database: 'sapatos'  
+        host: 'localhost',
+        user: 'root',
+        password: '',
+        database: 'sapatos'
     });
 }
 // Rota para buscar todos os sapatos cadastrados no banco
@@ -68,7 +68,7 @@ app.get('/Sapatos', async (request: FastifyRequest, reply: FastifyReply) => {
     }
 
     // Monta a query inicial, usando "WHERE 1=1" para facilitar concatenação condicional
-    let query = "SELECT * FROM sapatos_db WHERE 1=1"; 
+    let query = "SELECT * FROM sapatos_db WHERE 1=1";
     const values: any[] = [];
 
     // Se nome foi passado, adiciona na query com LIKE para busca parcial
@@ -112,7 +112,7 @@ app.get('/Sapatos', async (request: FastifyRequest, reply: FastifyReply) => {
         } else if (erro.code === 'ER_PARSE_ERROR') {
             reply.status(400).send({ mensagem: "ERRO: Você tem um erro de escrita em sua QUERY confira: VÍRGULAS, PARENTESES E NOME DE COLUNAS" });
         } else {
-            reply.status(500).send({ mensagem: "Erro interno no servidor ao buscar o sapato." }); 
+            reply.status(500).send({ mensagem: "Erro interno no servidor ao buscar o sapato." });
         }
     } finally {
         // Fecha a conexão com o banco

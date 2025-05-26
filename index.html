@@ -1,200 +1,132 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
+import mysql, { Connection } from 'mysql2/promise';
+import fastify, { FastifyRequest, FastifyReply } from 'fastify';
+import cors from '@fastify/cors';
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Listagem de Sapatos - Velvet</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Playfair Display', serif;
-            margin: 0;
-            padding: 20px;
-            text-align: center;
-            background-color: rgba(255, 255, 255, 0.8);
-            position: relative;
-            z-index: 1;
+// Inicializa o servidor Fastify
+const app = fastify();
+// Registra o plugin CORS para permitir requisições de outras origens
+app.register(cors);
+
+// Função para criar uma conexão com o banco de dados 
+async function createDatabaseConnection(): Promise<Connection> {
+    return await mysql.createConnection({
+        host: 'localhost',
+        user: 'root',
+        password: '',
+        database: 'sapatos'
+    });
+}
+// Rota para buscar todos os sapatos cadastrados no banco
+app.get('/sapatos', async (request: FastifyRequest, reply: FastifyReply) => {
+    let conn: Connection | null = null;
+
+    try {
+        // Cria a conexão com o banco
+        conn = await createDatabaseConnection();
+
+        // Executa a consulta SQL para listar os sapatos (atenção ao nome da tabela e da query)
+        const [rows] = await conn.query<any>("SELECT * lista");
+
+        // Retorna os resultados para o cliente
+        reply.status(200).send(rows);
+
+    } catch (erro: any) {
+        console.error("Erro ao listar produto:", erro);
+
+        // Tratamento de erros específicos do MySQL para mensagens amigáveis
+        if (erro.code === 'ECONNREFUSED') {
+            reply.status(400).send({ mensagem: "ERRO: LIGUE O LARAGAO => Conexão Recusada" });
+        } else if (erro.code === 'ER_BAD_DB_ERROR') {
+            reply.status(400).send({ mensagem: "ERRO: CRIE UM BANCO DE DADOS COM O NOME DEFINIDO NA CONEXÃO" });
+        } else if (erro.code === 'ER_ACCESS_DENIED_ERROR') {
+            reply.status(400).send({ mensagem: "ERRO: CONFERIR O USUÁRIO E SENHA DEFINIDOS NA CONEXÃO" });
+        } else if (erro.code === 'ER_NO_SUCH_TABLE') {
+            reply.status(400).send({ mensagem: "ERRO: Você deve criar a tabela com o mesmo nome da sua QUERY" });
+        } else if (erro.code === 'ER_PARSE_ERROR') {
+            reply.status(400).send({ mensagem: "ERRO: Você tem um erro de escrita em sua QUERY confira: VÍRGULAS, PARENTESES E NOME DE COLUNAS" });
+        } else {
+            reply.status(500).send({ mensagem: "ERRO: NÃO IDENTIFICADO" }); // Erro genérico
         }
-
-        form {
-            max-width: 400px;
-            margin: 20px auto;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            background-color: #f9f9f9;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    } finally {
+        // Fecha a conexão com o banco, se aberta
+        if (conn) {
+            await conn.end();
         }
+    }
+});
 
-        input, button {
-            width: 100%;
-            margin: 10px 0;
-            padding: 12px;
-            box-sizing: border-box;
-            border-radius: 4px;
-            border: 1px solid #ddd;
+// Rota para buscar sapatos por nome e/ou preço
+app.get('/Sapatos', async (request: FastifyRequest, reply: FastifyReply) => {
+    let conn: Connection | null = null;
+
+    // Pega os parâmetros da query string
+    const { nome, preco } = request.query as { nome?: string; preco?: string };
+
+    // Se nenhum parâmetro for passado, retorna erro
+    if (!nome && !preco) {
+        return reply.status(400).send({ mensagem: "Por favor, forneça o nome ou o preço do sapato para buscar." });
+    }
+
+    // Monta a query inicial, usando "WHERE 1=1" para facilitar concatenação condicional
+    let query = "SELECT * FROM sapatos_db WHERE 1=1";
+    const values: any[] = [];
+
+    // Se nome foi passado, adiciona na query com LIKE para busca parcial
+    if (nome) {
+        query += " AND nome LIKE ?";
+        values.push(`%${nome}%`);
+    }
+
+    // Se preco foi passado, adiciona na query para busca exata no preço
+    if (preco) {
+        query += " AND preco = ?";
+        values.push(preco);
+    }
+
+    try {
+        // Cria conexão com o banco
+        conn = await createDatabaseConnection();
+
+        // Executa a query parametrizada
+        const [rows] = await conn.query<any>(query, values);
+
+        if (rows.length > 0) {
+            // Retorna os resultados encontrados
+            reply.status(200).send(rows);
+        } else {
+            // Caso nenhum resultado encontrado, informa ao cliente
+            reply.status(404).send({ mensagem: "ESSE PRODUTO NÃO EXISTE" });
         }
+    } catch (erro: any) {
+        console.error("Erro ao buscar sapato por nome e preco:", erro);
 
-        button {
-            background-color: #8C0808;
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background-color 0.3s;
+        // Tratamento de erros MySQL para mensagens amigáveis
+        if (erro.code === 'ECONNREFUSED') {
+            reply.status(400).send({ mensagem: "ERRO: LIGUE O LARAGAO => Conexão Recusada" });
+        } else if (erro.code === 'ER_BAD_DB_ERROR') {
+            reply.status(400).send({ mensagem: "ERRO: CRIE UM BANCO DE DADOS COM O NOME DEFINIDO NA CONEXÃO" });
+        } else if (erro.code === 'ER_ACCESS_DENIED_ERROR') {
+            reply.status(400).send({ mensagem: "ERRO: CONFERIR O USUÁRIO E SENHA DEFINIDOS NA CONEXÃO" });
+        } else if (erro.code === 'ER_NO_SUCH_TABLE') {
+            reply.status(400).send({ mensagem: "ERRO: Você deve criar a tabela com o mesmo nome da sua QUERY" });
+        } else if (erro.code === 'ER_PARSE_ERROR') {
+            reply.status(400).send({ mensagem: "ERRO: Você tem um erro de escrita em sua QUERY confira: VÍRGULAS, PARENTESES E NOME DE COLUNAS" });
+        } else {
+            reply.status(500).send({ mensagem: "Erro interno no servidor ao buscar o sapato." });
         }
-
-        button:hover {
-            background-color: #590202;
+    } finally {
+        // Fecha a conexão com o banco
+        if (conn) {
+            await conn.end();
         }
+    }
+});
 
-        #listaSapatos {
-            max-width: 800px;
-            margin: 30px auto;
-            text-align: left;
-        }
-
-        .delete-btn {
-            background-color: #e63757;
-        }
-
-        #mensagem {
-            margin: 20px 0;
-            padding: 10px;
-            border-radius: 4px;
-        }
-
-        .success {
-            background-color: #d4edda;
-            color: #155724;
-        }
-
-        .error {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-
-        #videoFundo {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            object-fit: cover;
-            z-index: -1;   /* fica atrás do conteúdo */
-            opacity: 0.5; /*deixa o a opacidadade*/
-        }
-    </style>
-</head>
-
-<body>
-    <h1>Listagem de Sapatos - Velvet</h1>
-
-    <form id="sapatoForm"> <!--formulario para adiconar os itens-->
-        <input type="hidden" id="sapatoId">
-        <label for="nome">Nome do Sapato:</label>
-        <input type="text" id="nome" name="nome" required>
-        <label for="preco">Preço:</label>
-        <input type="number" id="preco" name="preco" step="0.01" required>
-        <button type="submit" id="submitBtn">Adicionar Sapato</button>
-    </form>
-
-    <div id="mensagem"></div> <!--mensaegem de sucesso -->
-    <video autoplay muted loop id="videoFundo"> <!--video de fundo -->
-        <source src="https://cdn.cosmos.so/75f42abb-79b7-4bbb-91ca-2f9b52ec8d0d.mp4" type="video/mp4">
-    </video>
-
-    <script>
-            // Função para mostrar mensagens na tela (recebe um parâmetro do tipo texto (sucesso ou erro)
-
-        function mostrarMensagem(texto, tipo) {
-            const mensagem = document.getElementById('mensagem'); //busca elementos HTML com o id mensagem 
-            mensagem.textContent = texto; //define o conteúdo de texto da mensagem 
-
-            mensagem.className = tipo; // Define a classe para estilo (success ou error)
-            mensagem.style.display = 'block';  //mostra a mensagem
-
-            setTimeout(() => {
-                mensagem.style.display = 'none';
-            }, 8000);
-        } //depois de 8 segundos esconde a mensagem 
-
-         // Função para carregar a lista de sapatos do backend via API:
-
-        async function carregarSapatos() {
-            try {
-                // função para assíncrona "carregarSapatos", que vai usar o await para lidar com as requisições 
-
-                const res = await fetch(`${apiBase}/sapatos`); // faz requisição pra api obter a lista dos sapatos (Get)
-
-                if (!res.ok) throw new Error('Erro ao carregar sapatos'); // lança um erro (200)
-
-                const sapatos = await res.json(); //converte a resposta em Jason para api em onj javascript (no caos a lista de sapato)
-
-                tabelaBody.innerHTML = ''; //limpa o conteúdo atual da tabela
-
-                sapatos.forEach(sapato => {
-                    const tr ={ //para casa sapato retornando na api, executa o código de baixo:
-
- document.createElement('tr'); //cria uma nova linha na tabela 
-                    tr.innerHTML = `
-                        <td>${sapato.nome}</td>
-                        <td>${parseFloat(sapato.preco).toFixed(2)}</td>
-                    `; //define células da linha com nome e preço do sapato
-
-                    tabelaBody.appendChild(tr);
-                }); // add nova linha na tabela
-
-                // se não tiver o sapatos, mostra mensagem na tabela
-                if (sapatos.length === 0) {
-                    tabelaBody.innerHTML = '<tr><td colspan="2">Nenhum sapato cadastrado.</td></tr>';
-                }
-            } catch (err) {
-                mostrarMensagem(err.message, 'error'); // Exibe erro na tela se a API falhar 
-            }
-        } 
-
-        // Evento para interceptar o envio do formulário
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault(); // Evita que a página recarregue
-
-            // Pega os valores digitados pelo usuário e remove espaços em branco 
-            const nome = form.nome.value.trim();
-            const preco = form.preco.value.trim();
-
-            // 
-            if (!nome || !preco) {
-                mostrarMensagem('Preencha todos os campos', 'error');
-                return;
-            } //aparece a a msm "preencha os campos"
-
-            try {
-
-                // Envia os dados para a API pelo método POST em formato JSON
-                const res = await fetch(`${apiBase}/sapatos`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nome, preco: parseFloat(preco) })
-                });
-
-                const data = await res.json();
-                //converte a resposta de API em obj Jason
-
-                if (!res.ok) throw new Error(data.erro || 'Erro ao adicionar sapato'); //se a resposta não for ok lança um erro com a msm recebida pela API
-
-                mostrarMensagem(data.mensagem, 'success'); // Mostra mensagem de sucesso da API
-
-                form.reset(); // Limpa o formulário
-
-                carregarSapatos(); // Atualiza a lista de sapatos na tela
-
-            } catch (err) {
-                mostrarMensagem(err.message, 'error'); // Exibe erro na tela
-            }
-        });
-
-        // Carrega os sapatos automaticamente quando a página termina de carregar
-        window.onload = carregarSapatos;
-    </script>
-</body>
+// Inicializa o servidor Fastify na porta 8000
+app.listen({ port: 8000 }, (err, address) => {
+    if (err) {
+        console.error("Erro ao iniciar servidor:", err);
+        process.exit(1); // Sai do processo em caso de erro
+    }
+    console.log(`Servidor ouvindo em ${address}`);
+});
